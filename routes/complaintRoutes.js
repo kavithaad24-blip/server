@@ -1,7 +1,12 @@
-const express = require('express');
+import express from 'express';
+import { createComplaint, getUserComplaints, getComplaints, predictComplaintDelay } from '../controllers/complaintController.js';
+import { authMiddleware } from '../middleware/authMiddleware.js';
+
 const router = express.Router();
-const { createComplaint } = require('../controllers/complaintController');
 
 router.post('/', createComplaint);
+router.get('/', getComplaints);
+router.get('/user-complaints', authMiddleware, getUserComplaints);
+router.post('/predict-delay', authMiddleware, predictComplaintDelay);
 
-module.exports = router;
+export default router;

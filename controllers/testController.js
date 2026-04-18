@@ -1,6 +1,6 @@
-const pool = require('../config/db');
+import pool from '../config/db.js';
 
-exports.testMessage = async (req, res) => {
+export const testMessage = async (req, res) => {
   try {
     const [rows] = await pool.query('SELECT 1 + 1 AS solution');
     res.status(200).json({
