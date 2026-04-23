@@ -36,3 +36,25 @@ export const login = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+export const updateProfile = async (req, res) => {
+  try {
+    const { id, name, email, password } = req.body;
+    
+    // Check if new email is taken by someone else
+    const [existing] = await pool.query('SELECT * FROM users WHERE email = ? AND id != ?', [email, id]);
+    if (existing.length > 0) return res.status(400).json({ error: 'Email already used by another account' });
+
+    if (password && password.trim() !== '') {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      await pool.query('UPDATE users SET name = ?, email = ?, password = ? WHERE id = ?', [name, email, hashedPassword, id]);
+    } else {
+      await pool.query('UPDATE users SET name = ?, email = ? WHERE id = ?', [name, email, id]);
+    }
+
+    const token = jwt.sign({ id, email }, JWT_SECRET, { expiresIn: '1d' });
+    res.status(200).json({ success: true, token, user: { id, name, email } });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
