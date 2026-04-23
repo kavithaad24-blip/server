@@ -3,13 +3,13 @@ import pool from "../config/db.js";
 
 export const createComplaint = async (req, res) => {
   try {
-    const { description, location } = req.body;
+    const { description, location, address } = req.body;
     const userId = req.user?.id;
     const image = req.file?.filename;
 
     const [result] = await pool.query(
-      "INSERT INTO complaints (user_id, description, location, image, status) VALUES (?, ?, ?, ?, ?)",
-      [userId, description, location, image, "Pending"]
+      "INSERT INTO complaints (user_id, description, location, address, image, status) VALUES (?, ?, ?, ?, ?, ?)",
+      [userId, description, location, address, image, "Pending"]
     );
 
     res.json({ message: "Complaint added", id: result.insertId });

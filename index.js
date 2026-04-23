@@ -7,6 +7,8 @@ import testRoutes from './routes/testRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import complaintRoutes from './routes/complaintRoutes.js';
 import auditRoutes from './routes/auditRoutes.js';
+import serviceRoutes from './routes/serviceRoutes.js';
+import issueRoutes from './routes/issueRoutes.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -63,7 +65,9 @@ pool.getConnection()
 app.use('/api', testRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/complaints', complaintRoutes);
+app.use('/api', serviceRoutes);
 app.use('/api/audit', auditRoutes);
+app.use('/api/issues', issueRoutes);
 
 app.get('/', (req, res) => {
   res.send('Citizen Service Portal Server is running and connected to database!');

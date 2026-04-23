@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS complaints (
   user_id INT,
   description TEXT NOT NULL,
   location VARCHAR(255),
+  address VARCHAR(255),
   image VARCHAR(255),
   status VARCHAR(50) DEFAULT 'Pending',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -80,13 +81,41 @@ CREATE TABLE IF NOT EXISTS service_requests (
   INDEX idx_status (current_status)
 );
 
--- Insert sample services
-INSERT IGNORE INTO services (name, description, department, average_processing_days, priority) VALUES
-('Birth Certificate', 'Apply for birth certificate registration', 'Civil Registry', 3, 'High'),
-('Property Tax Assessment', 'Request property tax reassessment', 'Municipal Tax', 7, 'Normal'),
-('Water Connection', 'Apply for new water connection', 'Water Supply', 10, 'Normal'),
-('Building Permission', 'Apply for construction/renovation permission', 'Municipal Corp', 15, 'High'),
-('Trade License', 'Apply for business/trade license', 'Commerce', 5, 'Normal'),
-('Driving License Renewal', 'Renew your driving license', 'RTO', 2, 'High'),
-('Pension Application', 'Apply for government pension', 'Social Welfare', 20, 'Normal'),
-('Housing Subsidy', 'Apply for affordable housing scheme', 'Housing', 30, 'Low');
+-- Create local_issues table for Community Prioritization
+CREATE TABLE IF NOT EXISTS local_issues (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  title VARCHAR(255) NOT NULL,
+  description TEXT,
+  category VARCHAR(100),
+  location VARCHAR(255),
+  priority_score INT DEFAULT 0,
+  vote_count INT DEFAULT 0,
+  status VARCHAR(50) DEFAULT 'Active',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_category (category),
+  INDEX idx_status (status),
+  INDEX idx_vote_count (vote_count)
+);
+
+-- Create issue_votes table for tracking user votes
+CREATE TABLE IF NOT EXISTS issue_votes (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  issue_id INT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id),
+  FOREIGN KEY (issue_id) REFERENCES local_issues(id),
+  UNIQUE KEY unique_user_issue (user_id, issue_id),
+  INDEX idx_user_id (user_id),
+  INDEX idx_issue_id (issue_id)
+);
+
+-- Insert sample local issues
+INSERT IGNORE INTO local_issues (title, description, category, location, priority_score) VALUES
+('Fix Potholes on Main Street', 'Multiple large potholes causing traffic hazards and vehicle damage', 'Infrastructure', 'Main Street, Downtown', 85),
+('Upgrade Street Lights in Zone 4', 'Many street lights are not working, affecting safety at night', 'Infrastructure', 'Zone 4, Residential Area', 72),
+('Park Maintenance Required', 'Park benches broken, grass overgrown, playground equipment damaged', 'Environment', 'Central Park', 68),
+('Clean Drainage System', 'Blocked drains causing water stagnation and mosquito breeding', 'Sanitation', 'Market Area', 91),
+('Repair Broken Traffic Signals', 'Traffic signals malfunctioning at busy intersection', 'Infrastructure', 'Transport Hub', 78),
+('Install Speed Bumps', 'High speed traffic in residential areas', 'Safety', 'School Zone', 65);

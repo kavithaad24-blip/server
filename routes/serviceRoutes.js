@@ -1,6 +1,7 @@
 import express from 'express';
 import { 
   getAllServices, 
+  predictServiceDelay, 
   getUserServiceRequests, 
   trackServiceRequest, 
   submitServiceRequest 
@@ -9,8 +10,9 @@ import { authMiddleware } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-// Public endpoint - get all services
+// Public endpoints
 router.get('/services', getAllServices);
+router.get('/services/:id/predict', authMiddleware, predictServiceDelay);
 
 // Protected endpoints
 router.get('/service-requests', authMiddleware, getUserServiceRequests);

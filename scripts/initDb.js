@@ -1,5 +1,6 @@
 import mysql from 'mysql2/promise';
 import dotenv from 'dotenv';
+import bcrypt from 'bcrypt';
 
 dotenv.config();
 
@@ -134,6 +135,14 @@ async function initializeDatabase() {
       ('Housing Subsidy', 'Apply for affordable housing scheme', 'Housing', 30, 'Low')
     `);
     console.log('✓ Sample services inserted');
+
+    // Insert demo user
+    const demoPassword = 'Demo@12345';
+    const hashedPassword = await bcrypt.hash(demoPassword, 10);
+    await connection.query(`
+      INSERT IGNORE INTO users (name, email, password) VALUES (?, ?, ?)
+    `, ['Demo User', 'demo@citizen.gov', hashedPassword]);
+    console.log('✓ Demo user inserted');
 
     console.log('\n✓ Database initialization complete!');
   } catch (error) {
